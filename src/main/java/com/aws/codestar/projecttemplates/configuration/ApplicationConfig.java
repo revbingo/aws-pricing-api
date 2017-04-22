@@ -1,13 +1,13 @@
 package com.aws.codestar.projecttemplates.configuration;
 
+import com.revbingo.web.ApiController;
+import com.revbingo.web.ApplicationController;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-
-import com.aws.codestar.projecttemplates.controller.HelloWorldController;
 
 /**
  * Spring configuration for sample application.
@@ -17,17 +17,13 @@ import com.aws.codestar.projecttemplates.controller.HelloWorldController;
 @PropertySource("classpath:application.properties")
 public class ApplicationConfig {
 
-    /**
-     * Retrieved from properties file.
-     */
-    @Value("${HelloWorld.SiteName}")
-    private String siteName;
-
     @Bean
-    public HelloWorldController helloWorld() {
-        return new HelloWorldController(this.siteName);
+    public ApplicationController helloWorld() {
+        return new ApplicationController();
     }
 
+    @Bean
+    public ApiController apiController() { return new ApiController(); }
     /**
      * Required to inject properties using the 'Value' annotation.
      */
