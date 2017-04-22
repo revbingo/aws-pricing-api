@@ -1,5 +1,6 @@
 package com.aws.codestar.projecttemplates.controller;
 
+import com.revbingo.KotlinTest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,7 +22,7 @@ public class HelloWorldController {
     @RequestMapping(method = RequestMethod.GET)
     public ModelAndView helloWorld() {
         ModelAndView mav = new ModelAndView("index");
-        mav.addObject("siteName", this.siteName);
+        mav.addObject("siteName", new KotlinTest("kotlin!").getString());
         return mav;
     }
 
