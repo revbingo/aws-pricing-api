@@ -1,19 +1,27 @@
 package com.revbingo.web
 
+import com.revbingo.price.Attributes
 import com.revbingo.price.Price
+import com.revbingo.price.PricingProvider
+import com.revbingo.price.toLongRegionName
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
+@Component
 @RestController
-class ApiController {
+class ApiController @Autowired constructor(val pricingProvider: PricingProvider) {
 
     @RequestMapping("/price")
-    fun getPrice(@RequestParam(name="type") type: String): Price {
-        return when(type) {
-            "m3.large" -> "1.00"
-            "m3.medium" -> "2.00"
-            else -> "0.00"
-        }
+    fun getPrice(@RequestParam(name="type") type: String,
+                 @RequestParam(name="region", defaultValue="us-east-1") region: String,
+                 @RequestParam(name="tenancy", defaultValue = "Shared") tenancy: String,
+                 @RequestParam(name="os", defaultValue = "Linux") os: String,
+                 @RequestParam(name="software", defaultValue = "NA") software: String,
+                 @RequestParam(name="license", defaultValue = "No License required") license: String): Price? {
+        val price = pricingProvider.priceFor(Attributes(region.toLongRegionName(), type, tenancy, os, software, license))
+        return price
     }
 }
