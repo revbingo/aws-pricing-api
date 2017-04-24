@@ -35,7 +35,7 @@ class PricingProvider @Autowired constructor(@Value("\${ec2.offer.url}") val pri
     var pricingFile: PricingFile
 
     init {
-        pricingFile = loadFile("https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/index.json")
+        pricingFile = loadFile(pricingFileUrl)
     }
 
     fun loadFile(url: String, filter: (Product) -> Boolean = { it.productFamily == "Compute Instance" }):PricingFile {
@@ -74,11 +74,4 @@ private fun OperatingSystem.adaptOS(): String = when(this.toLowerCase()) {
     "windows" -> "Windows"
     "linux/unix", "linux" -> "Linux"
     else -> "Other"
-}
-
-
-fun main(args: Array<String>) {
-    val pricingProvider = PricingProvider("https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/index.json")
-    pricingProvider.pricingFile.products.values.filter { it.attributes.instanceType == "m3.medium" }.forEach(::println)
-    println(pricingProvider.priceFor(Attributes(location="us-east-1a".toLongRegionName(), instanceType="m3.medium", tenancy="Shared", operatingSystem="Linux", preInstalledSw="NA", licenseModel="No License required")))
 }
