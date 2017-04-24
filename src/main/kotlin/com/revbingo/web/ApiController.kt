@@ -18,8 +18,13 @@ class ApiController @Autowired constructor(val pricingProvider: PricingProvider)
                  @RequestParam(name="tenancy", defaultValue = "Shared") tenancy: String,
                  @RequestParam(name="os", defaultValue = "Linux") os: String,
                  @RequestParam(name="software", defaultValue = "NA") software: String,
-                 @RequestParam(name="license", defaultValue = "No License required") license: String): Any {
-        val price = pricingProvider.priceFor(Attributes(region.toLongRegionName(), type, tenancy, os.adaptOS(), software, license))
+                 @RequestParam(name="license", defaultValue = "") license: String): Any {
+        val adaptedOs = os.adaptOS()
+        val defaultLicense = when(license) {
+            "" -> if(adaptedOs == "Windows") "included" else "none"
+            else -> license
+        }
+        val price = pricingProvider.priceFor(Attributes(region.toLongRegionName(), type, tenancy.capitalize(), adaptedOs, software, defaultLicense.adaptLicense()))
         return price
     }
 }

@@ -10,9 +10,5 @@ import org.springframework.web.servlet.ModelAndView
 class ApplicationController {
 
     @RequestMapping(method = arrayOf(RequestMethod.GET))
-    fun helloWorld(): ModelAndView {
-        val mav = ModelAndView("index")
-        mav.addObject("siteName", "")
-        return mav
-    }
+    fun hello() = ModelAndView("index")
 }

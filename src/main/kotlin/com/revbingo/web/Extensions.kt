@@ -16,5 +16,12 @@ fun AvailabilityZone.toLongRegionName(): String = when(this) {
 fun OperatingSystem.adaptOS(): String = when(this.toLowerCase()) {
     "windows" -> "Windows"
     "linux/unix", "linux" -> "Linux"
-    else -> "Other"
+    else -> this
+}
+
+fun String.adaptLicense(): String = when(this.toLowerCase()) {
+    "included" -> "License Included"
+    "byo" -> "Bring your own license"
+    "none" -> "No License required"
+    else -> this
 }
