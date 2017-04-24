@@ -24,7 +24,6 @@ class ApiController @Autowired constructor(val pricingProvider: PricingProvider)
             "" -> if(adaptedOs == "Windows") "included" else "none"
             else -> license
         }
-        val price = pricingProvider.priceFor(Attributes(region.toLongRegionName(), type, tenancy.capitalize(), adaptedOs, software, defaultLicense.adaptLicense()))
-        return price
+        return pricingProvider.priceFor(Attributes(region.toLongRegionName(), type, tenancy.capitalize(), adaptedOs, software, defaultLicense.adaptLicense()))
     }
 }
