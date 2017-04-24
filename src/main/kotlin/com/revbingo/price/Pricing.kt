@@ -6,7 +6,9 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import java.math.BigDecimal
 import java.net.URL
+import java.util.logging.Logger
 
 typealias InstancePrices = Map<String, Term>
 typealias Term = Map<String, Offer>
@@ -26,6 +28,9 @@ data class InstancePrice(val hourly: PriceDimension, val upfront: PriceDimension
 typealias AvailabilityZone = String
 typealias OperatingSystem = String
 
+val transactionLogger = Logger.getLogger("transactions")
+val logger = Logger.getLogger("com.revbingo.web")
+
 @Component
 class PricingProvider @Autowired constructor(@Value("\${ec2.offer.url}") val pricingFileUrl: String) {
 
@@ -42,36 +47,30 @@ class PricingProvider @Autowired constructor(@Value("\${ec2.offer.url}") val pri
 
         val mapper = jacksonObjectMapper()
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        println("Loading pricing file")
+        logger.info("Loading pricing file")
         val file = mapper.readValue<PricingFile>(URL(url))
-        println("**** Loaded!")
+        logger.info("Loaded file with ${file.products.count()} products and ${file.terms["OnDemand"]!!.count() + file.terms["Reserved"]!!.count()} terms")
+
         file.products = file.products.values.filter(filter).associate { Pair(it.sku, it) }
         file.terms["OnDemand"] = file.terms["OnDemand"]!!.filter { it.key in file.products }
         file.terms["Reserved"] = file.terms["Reserved"]!!.filter { it.key in file.products }
 
+        logger.info("Filtered file to ${file.products.count()} products and ${file.terms["OnDemand"]!!.count() + file.terms["Reserved"]!!.count()} terms")
+
         return file
     }
 
-    fun priceFor(attr: Attributes): Price? {
-        println("looking for ${attr}")
-        val product = pricingFile!!.products.values.find { it.attributes == attr }
+    fun priceFor(attr: Attributes): Any {
+        transactionLogger.info(attr.toString())
+        val product = pricingFile.products.values.find { it.attributes == attr }
 
-        return pricingFile!!.terms.get("OnDemand")?.get(product?.sku)?.get("${product?.sku}.$HOURLY_OFFER")?.priceDimensions?.get("${product?.sku}.$HOURLY_OFFER.$RATE_CODE")?.pricePerUnit?.get("USD")
+        product ?: return ErrorResponse("No product found for ${attr}")
+        val usdCost = pricingFile.terms.get("OnDemand")?.get(product?.sku)?.get("${product?.sku}.$HOURLY_OFFER")?.priceDimensions?.get("${product?.sku}.$HOURLY_OFFER.$RATE_CODE")?.pricePerUnit?.get("USD")
+
+        usdCost ?: return ErrorResponse("No cost found for sku ${product.sku}")
+        return PriceResponse(BigDecimal(usdCost), "USD", product.sku, product.attributes)
     }
 }
 
-fun AvailabilityZone.toLongRegionName(): String = when(this) {
-    "eu-west-1" -> "EU (Ireland)"
-    "us-west-1" -> "US West (N. California)"
-    "us-west-2" -> "US West (Oregon)"
-    "ap-southeast-1" -> "Asia Pacific (Singapore)"
-    "ap-southeast-2" -> "Asia Pacific (Sydney)"
-    "us-east-1" -> "US East (N. Virginia)"
-    else -> this
-}
-
-private fun OperatingSystem.adaptOS(): String = when(this.toLowerCase()) {
-    "windows" -> "Windows"
-    "linux/unix", "linux" -> "Linux"
-    else -> "Other"
-}
+data class ErrorResponse(val errorMessage: String)
+data class PriceResponse(val price: BigDecimal, val currency: String = "USD", val sku: String, val attributes: Attributes)

@@ -1,9 +1,7 @@
 package com.revbingo.web
 
 import com.revbingo.price.Attributes
-import com.revbingo.price.Price
 import com.revbingo.price.PricingProvider
-import com.revbingo.price.toLongRegionName
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.RequestMapping
@@ -20,8 +18,8 @@ class ApiController @Autowired constructor(val pricingProvider: PricingProvider)
                  @RequestParam(name="tenancy", defaultValue = "Shared") tenancy: String,
                  @RequestParam(name="os", defaultValue = "Linux") os: String,
                  @RequestParam(name="software", defaultValue = "NA") software: String,
-                 @RequestParam(name="license", defaultValue = "No License required") license: String): Price? {
-        val price = pricingProvider.priceFor(Attributes(region.toLongRegionName(), type, tenancy, os, software, license))
+                 @RequestParam(name="license", defaultValue = "No License required") license: String): Any {
+        val price = pricingProvider.priceFor(Attributes(region.toLongRegionName(), type, tenancy, os.adaptOS(), software, license))
         return price
     }
 }
