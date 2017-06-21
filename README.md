@@ -1,71 +1,22 @@
-Welcome to the AWS CodeStar sample web application
-==================================================
+AWS Pricing API
+====
 
-This sample code helps get you started with a simple Java web application
-deployed by AWS CodeDeploy to an Amazon EC2 server.
+A web API for making sense of the AWS EC2 Pricing "API" (in reality, a bunch of very large JSON files).  This was originally
+a very small project for testing the AWS CodeStar service - hence it is based on Spring, has zero tests, and a bunch of scripts
+that probably don't make sense outside the CodeStar ecosystem. It probably works, but might not. But it's here, and it's MIT licensed, 
+so use as you see fit. 
 
-What's Here
------------
+To use the API, simply hit `/price` and pass the following query string parameters (optional unless otherwise stated):
 
-This sample includes:
+* type (mandatory) - the instance type e.g. `t2.micro`
+* region - the region in which the instance is situated. Default: `us-east-1`
+* tenancy - whether this instance is a `shared`, `dedicated` or `host` tenancy. Default: `shared`
+* os - the operating system of the instance. Default: `linux`
+* software - the software installed on the instance. Default: `NA`
+* license - the license type for the software, 'included', 'byo' or 'none'. Default: 'none'
 
-* README.md - this file
-* appspec.yml - this file is used by AWS CodeDeploy when deploying the web
-  application to EC2
-* buildspec.yml - this file is used by AWS CodeBuild to build the web
-  application
-* pom.xml - this file is the Maven Project Object Model for the web application
-* src/ - this directory contains your Java application source files
-* scripts/ - this directory contains scripts used by AWS CodeDeploy when
-  installing and deploying your application on the Amazon EC2 instance
-
-
-Getting Started
----------------
-
-These directions assume you want to develop on your local computer, and not
-from the Amazon EC2 instance itself. If you're on the Amazon EC2 instance, the
-virtual environment is already set up for you, and you can start working on the
-code.
-
-To work on the sample code, you'll need to clone your project's AWS CodeCommit
-repository to your local computer. If you haven't, do that first. You can find
-instructions in the AWS CodeStar user guide.
-
-1. Install maven.  See https://maven.apache.org/install.html for details.
-
-2. Install tomcat.  See https://tomcat.apache.org/tomcat-7.0-doc/setup.html for
-   details.
-
-3. Build the application.
-
-        $ mvn -f pom.xml compile
-        $ mvn -f pom.xml package
-
-4. Copy the built application to the Tomcat webapp directory.  The actual
-   location of that directory will vary depending on your platform and
-   installation.
-
-        $ cp target/ROOT.war <tomcat webapp directory>
-
-4. Restart your tomcat server
-
-5. Open http://127.0.0.1:8080/ in a web browser to view your application.
-
-What Do I Do Next?
-------------------
-
-Once you have a virtual environment running, you can start making changes to
-the sample Java web application. We suggest making a small change to
-/src/main/webapp/WEB-INF/views/index.jsp first, so you can see how changes
-pushed to your project's repository in AWS CodeCommit are automatically picked
-up by your project pipeline and deployed to the Amazon EC2 instance. (You can
-watch the pipeline progress on your project dashboard.) Once you've seen how
-that works, start developing your own code, and have fun!
-
-Learn more about AWS CodeStar by reading the user guide. Ask questions or make
-suggestions on our forum.
-
-User Guide: http://docs.aws.amazon.com/codestar/latest/userguide/welcome.html
-
-Forum: https://forums.aws.amazon.com/forum.jspa?forumID=248
+If this is useful to you...
+=====
+Just a hint, but if you're looking at this code and thinking "this is just what I need", you should probably be aware
+that I didn't go any further with it because as I was scouting for possible domain names I came across (this API)[http://ec2price.info/] 
+which is free, hosted and works in almost exactly the same way as this code. You might want to use that instead.
