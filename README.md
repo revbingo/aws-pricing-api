@@ -18,5 +18,5 @@ To use the API, simply hit `/price` and pass the following query string paramete
 If this is useful to you...
 =====
 Just a hint, but if you're looking at this code and thinking "this is just what I need", you should probably be aware
-that I didn't go any further with it because as I was scouting for possible domain names I came across (this API)[http://ec2price.info/] 
+that I didn't go any further with it because as I was scouting for possible domain names I came across [this API](http://ec2price.info/) 
 which is free, hosted and works in almost exactly the same way as this code. You might want to use that instead.
